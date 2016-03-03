@@ -130,32 +130,32 @@ namespace GPCombatController.Views
         {
             base.OnPointerPressed(e);
 
-            var pos = e.GetCurrentPoint(this);
+            var pos = e.GetCurrentPoint(GridPad);
 
-            if (pos.RawPosition.Y < ActualHeight/4 &&
-                ActualWidth*3/8 < pos.RawPosition.X &&
-                pos.RawPosition.X < ActualHeight*5/8)
+            if (pos.RawPosition.Y < GridPad.ActualHeight/4 &&
+                GridPad.ActualWidth *3/8 < pos.RawPosition.X &&
+                pos.RawPosition.X < GridPad.ActualWidth *5/8)
             {
                 PressedId = e.Pointer.PointerId;
                 KeyState = ECrossKeyState.Up;
             }
-            else if (pos.RawPosition.Y > ActualHeight*3/4 &&
-                     ActualWidth*3/8 < pos.RawPosition.X &&
-                     pos.RawPosition.X < ActualWidth*5/8)
+            else if (pos.RawPosition.Y > GridPad.ActualHeight *3/4 &&
+                     GridPad.ActualWidth *3/8 < pos.RawPosition.X &&
+                     pos.RawPosition.X < GridPad.ActualWidth *5/8)
             {
                 PressedId = e.Pointer.PointerId;
                 KeyState = ECrossKeyState.Down;
             }
-            else if (pos.RawPosition.X < ActualWidth/4 &&
-                     ActualHeight*3/8 < pos.RawPosition.Y &&
-                     pos.RawPosition.Y < ActualHeight*5/8)
+            else if (pos.RawPosition.X < GridPad.ActualWidth /4 &&
+                     GridPad.ActualHeight *3/8 < pos.RawPosition.Y &&
+                     pos.RawPosition.Y < GridPad.ActualHeight *5/8)
             {
                 PressedId = e.Pointer.PointerId;
                 KeyState = ECrossKeyState.Left;
             }
-            else if (pos.RawPosition.X > ActualWidth*3/4 &&
-                     ActualHeight*3/8 < pos.RawPosition.Y &&
-                     pos.RawPosition.Y < ActualHeight*5/8)
+            else if (pos.RawPosition.X > GridPad.ActualWidth *3/4 &&
+                     GridPad.ActualHeight *3/8 < pos.RawPosition.Y &&
+                     pos.RawPosition.Y < GridPad.ActualHeight *5/8)
             {
                 PressedId = e.Pointer.PointerId;
                 KeyState = ECrossKeyState.Right;
