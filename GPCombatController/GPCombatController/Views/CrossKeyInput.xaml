@@ -1,0 +1,69 @@
+﻿<UserControl
+    x:Class="GPCombatController.Views.CrossKeyInput"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:GPCombatController.Views"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    d:DesignHeight="300"
+    d:DesignWidth="400"
+    x:Name="ControlSelf">
+    <UserControl.Resources>
+        <local:KeyStateFillConverter x:Key="StateFillConverter"/>
+    </UserControl.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition/>
+            <ColumnDefinition Width="Auto"/>
+        </Grid.ColumnDefinitions>
+
+        <Border Grid.Row="0" Grid.Column="0" Background="Transparent"
+                Height="{Binding ElementName=ControlSelf, Path=VerticalSpaceSize}"
+                Width="{Binding ElementName=ControlSelf, Path=HorizontalSpaceSize}"/>
+        
+        <Border Grid.Row="2" Grid.Column="2" Background="Transparent"
+                Height="{Binding ElementName=ControlSelf, Path=VerticalSpaceSize}"
+                Width="{Binding ElementName=ControlSelf, Path=HorizontalSpaceSize}"/>
+
+        <Grid Grid.Row="1" Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="5"/>
+                <RowDefinition Height="1*"/>
+                <RowDefinition Height="1*"/>
+                <RowDefinition Height="5"/>
+                <RowDefinition Height="1*"/>
+                <RowDefinition Height="5"/>
+                <RowDefinition Height="1*"/>
+                <RowDefinition Height="1*"/>
+                <RowDefinition Height="5"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="5"/>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="5"/>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="5"/>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="5"/>
+            </Grid.ColumnDefinitions>
+
+            <Border Grid.Row="0" Grid.RowSpan="9" Grid.Column="3" Grid.ColumnSpan="3" Background="Black"/>
+            <Border Grid.Row="3" Grid.RowSpan="3" Grid.Column="0" Grid.ColumnSpan="9" Background="Black"/>
+
+            <Ellipse Grid.Row="1" Grid.Column="4" Fill="{Binding ElementName=ControlSelf, Path=KeyState, Converter={StaticResource StateFillConverter}, ConverterParameter=Up}"/>
+            <Ellipse Grid.Row="7" Grid.Column="4" Fill="{Binding ElementName=ControlSelf, Path=KeyState, Converter={StaticResource StateFillConverter}, ConverterParameter=Down}"/>
+            <Ellipse Grid.Row="4" Grid.Column="1" Fill="{Binding ElementName=ControlSelf, Path=KeyState, Converter={StaticResource StateFillConverter}, ConverterParameter=Left}"/>
+            <Ellipse Grid.Row="4" Grid.Column="7" Fill="{Binding ElementName=ControlSelf, Path=KeyState, Converter={StaticResource StateFillConverter}, ConverterParameter=Right}"/>
+        </Grid>
+    </Grid>
+</UserControl>

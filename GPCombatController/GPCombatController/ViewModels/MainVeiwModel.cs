@@ -31,6 +31,7 @@ namespace GPCombatController.ViewModels
     class MainVeiwModel : ViewModelBase
     {
         private bool _isScanning;
+        private KonashiInfo _selectedInfo;
         private RelayCommand _commandScan;
 
         public ObservableCollection<KonashiInfo> KonashiInfos { get; set; }
@@ -42,6 +43,22 @@ namespace GPCombatController.ViewModels
             {
                 if (_isScanning == value) return;
                 _isScanning = value;
+                OnPropertyChanged();
+            }
+        }
+        
+        public KonashiInfo SelectedInfo
+        {
+            get { return _selectedInfo; }
+            set
+            {
+                if (_selectedInfo == value) return;
+                
+                if (value != null)
+                {
+                }
+                
+                _selectedInfo = null;
                 OnPropertyChanged();
             }
         }
