@@ -9,6 +9,7 @@ using Windows.ApplicationModel.Core;
 using Windows.Devices.PointOfService;
 using Windows.UI.Core;
 using Windows.UI.Xaml;
+using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Data;
 using GPCombatController.Models.Konashi;
 
@@ -56,6 +57,7 @@ namespace GPCombatController.ViewModels
                 
                 if (value != null)
                 {
+                    AppFrame.Navigate(typeof (ControllerPage), value);
                 }
                 
                 _selectedInfo = null;
@@ -66,6 +68,8 @@ namespace GPCombatController.ViewModels
         private KonashiScanner Scanner { get; set; }
 
         private CoreDispatcher Dispatcher => CoreApplication.MainView.CoreWindow.Dispatcher;
+
+        private Frame AppFrame => Window.Current.Content as Frame;
 
         public ICommand CommandScan => _commandScan ?? (_commandScan = new RelayCommand(Scan));
 

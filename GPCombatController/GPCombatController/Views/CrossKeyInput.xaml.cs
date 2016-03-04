@@ -17,19 +17,12 @@ using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 using GPCombatController.Annotations;
+using GPCombatController.Models;
 
 // The User Control item template is documented at http://go.microsoft.com/fwlink/?LinkId=234236
 
 namespace GPCombatController.Views
 {
-    public enum ECrossKeyState
-    {
-        None,
-        Left,
-        Up,
-        Right,
-        Down,
-    }
 
     public class KeyStateFillConverter : IValueConverter
     {
@@ -38,8 +31,18 @@ namespace GPCombatController.Views
 
         public object Convert(object value, Type targetType, object parameter, string language)
         {
-            var param = (string)parameter;
-            var key = (ECrossKeyState) Enum.Parse(typeof (ECrossKeyState), param);
+            var param = string.Empty;
+            var key = ECrossKeyState.None;
+            try
+            {
+                param = (string)parameter;
+                key = (ECrossKeyState)Enum.Parse(typeof(ECrossKeyState), param);
+            }
+            catch (Exception)
+            {
+                return NotActiveBrush;
+            }
+
             var state = (ECrossKeyState)value;
 
             return key == state ? ActiveBrush : NotActiveBrush;
@@ -53,9 +56,10 @@ namespace GPCombatController.Views
 
     public sealed partial class CrossKeyInput : UserControl, INotifyPropertyChanged
     {
+        private const long RelasedKeyId = -1;
+
         private double _verticalSpaceSize;
         private double _horizontalSpaceSize;
-        private ECrossKeyState _keyState;
         public event PropertyChangedEventHandler PropertyChanged;
 
         [NotifyPropertyChangedInvocator]
@@ -86,16 +90,31 @@ namespace GPCombatController.Views
             }
         }
 
+        public static readonly DependencyProperty KeyStateProperty =
+            DependencyProperty.Register(nameof(KeyState), typeof(ECrossKeyState), typeof(CrossKeyInput),
+                PropertyMetadata.Create(ECrossKeyState.None, OnKeyStateChanged));
+
+        private static void OnKeyStateChanged(DependencyObject obj, DependencyPropertyChangedEventArgs e)
+        {
+            var input = obj as CrossKeyInput;
+
+            input?.OnPropertyChanged(nameof(KeyState));
+        }
+
         public ECrossKeyState KeyState
         {
-            get { return _keyState; }
-            set
-            {
-                if (value == _keyState) return;
-                _keyState = value;
-                OnPropertyChanged();
-            }
+            get { return (ECrossKeyState) GetValue(KeyStateProperty); }
+            set { SetValue(KeyStateProperty, value); }
         }
+
+        private double PointLeftMaxX => GridPad.ActualWidth/4;
+        private double PointRightMinX => GridPad.ActualWidth*3/4;
+        private double PointUpMaxY => GridPad.ActualHeight/4;
+        private double PointDownMinY => GridPad.ActualHeight*3/4;
+        private double PointHoriMinX => GridPad.ActualWidth*3/8;
+        private double PointHoriMaxX => GridPad.ActualWidth*5/8;
+        private double PointVerMinY => GridPad.ActualHeight*3/8;
+        private double PointVerMaxY => GridPad.ActualHeight*5/8;
 
         private long PressedId { get; set; }
 
@@ -130,42 +149,7 @@ namespace GPCombatController.Views
         {
             base.OnPointerPressed(e);
 
-            var pos = e.GetCurrentPoint(GridPad);
-
-            if (pos.RawPosition.Y < GridPad.ActualHeight/4 &&
-                GridPad.ActualWidth *3/8 < pos.RawPosition.X &&
-                pos.RawPosition.X < GridPad.ActualWidth *5/8)
-            {
-                PressedId = e.Pointer.PointerId;
-                KeyState = ECrossKeyState.Up;
-            }
-            else if (pos.RawPosition.Y > GridPad.ActualHeight *3/4 &&
-                     GridPad.ActualWidth *3/8 < pos.RawPosition.X &&
-                     pos.RawPosition.X < GridPad.ActualWidth *5/8)
-            {
-                PressedId = e.Pointer.PointerId;
-                KeyState = ECrossKeyState.Down;
-            }
-            else if (pos.RawPosition.X < GridPad.ActualWidth /4 &&
-                     GridPad.ActualHeight *3/8 < pos.RawPosition.Y &&
-                     pos.RawPosition.Y < GridPad.ActualHeight *5/8)
-            {
-                PressedId = e.Pointer.PointerId;
-                KeyState = ECrossKeyState.Left;
-            }
-            else if (pos.RawPosition.X > GridPad.ActualWidth *3/4 &&
-                     GridPad.ActualHeight *3/8 < pos.RawPosition.Y &&
-                     pos.RawPosition.Y < GridPad.ActualHeight *5/8)
-            {
-                PressedId = e.Pointer.PointerId;
-                KeyState = ECrossKeyState.Right;
-            }
-            else
-            {
-                PressedId = e.Pointer.PointerId;
-                KeyState = ECrossKeyState.None;
-            }
-
+            UpdateKeyState(e, false);
         }
 
         protected override void OnPointerCanceled(PointerRoutedEventArgs e)
@@ -201,6 +185,49 @@ namespace GPCombatController.Views
         protected override void OnPointerMoved(PointerRoutedEventArgs e)
         {
             base.OnPointerMoved(e);
+
+            var id = e.Pointer.PointerId;
+
+            if (id == PressedId || PressedId == RelasedKeyId)
+            {
+                UpdateKeyState(e, true);
+            }
+        }
+
+        private void UpdateKeyState(PointerRoutedEventArgs args, bool isMoved)
+        {
+            var pointerId = args.Pointer.PointerId;
+            var pos = args.GetCurrentPoint(GridPad).RawPosition;
+
+            if (pos.X < PointLeftMaxX && PointVerMinY < pos.Y && pos.Y < PointVerMaxY)
+            {
+                KeyState = ECrossKeyState.Left;
+                PressedId = pointerId;
+            }
+            else if (pos.X > PointRightMinX && PointVerMinY < pos.Y && pos.Y < PointVerMaxY)
+            {
+                KeyState = ECrossKeyState.Right;
+                PressedId = pointerId;
+            }
+            else if (pos.Y < PointUpMaxY && PointHoriMinX < pos.X && pos.X < PointHoriMaxX)
+            {
+                KeyState = ECrossKeyState.Up;
+                PressedId = pointerId;
+            }
+            else if (pos.Y > PointDownMinY && PointHoriMinX < pos.X && pos.X < PointHoriMaxX)
+            {
+                KeyState = ECrossKeyState.Down;
+                PressedId = pointerId;
+            }
+            else if (isMoved && PressedId == pointerId)
+            {
+                KeyState = ECrossKeyState.None;
+                PressedId =  pointerId;
+            }
+            else if (PressedId == RelasedKeyId)
+            {
+                KeyState = ECrossKeyState.None;
+            }
         }
     }
 }

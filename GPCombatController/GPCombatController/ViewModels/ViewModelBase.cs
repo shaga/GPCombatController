@@ -10,7 +10,7 @@ using GPCombatController.Annotations;
 
 namespace GPCombatController.ViewModels
 {
-    class ViewModelBase : INotifyPropertyChanged
+    abstract class ViewModelBase : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
 

@@ -57,6 +57,22 @@
                 <ColumnDefinition Width="5"/>
             </Grid.ColumnDefinitions>
 
+            <Border Grid.Row="0" Grid.RowSpan="4" Grid.Column="0" Grid.ColumnSpan="4" 
+                    Background="White" Opacity="0.01"
+                    Height="{Binding ElementName=ControlSelf, Path=VerticalSpaceSize}"
+                    Width="{Binding ElementName=ControlSelf, Path=HorizontalSpaceSize}"/>
+            <Border Grid.Row="0" Grid.RowSpan="4" Grid.Column="4" Grid.ColumnSpan="4" 
+                    Background="White" Opacity="0.01"
+                    Height="{Binding ElementName=ControlSelf, Path=VerticalSpaceSize}"
+                    Width="{Binding ElementName=ControlSelf, Path=HorizontalSpaceSize}"/>
+            <Border Grid.Row="4" Grid.RowSpan="4" Grid.Column="0" Grid.ColumnSpan="4" 
+                    Background="White" Opacity="0.01"
+                    Height="{Binding ElementName=ControlSelf, Path=VerticalSpaceSize}"
+                    Width="{Binding ElementName=ControlSelf, Path=HorizontalSpaceSize}"/>
+            <Border Grid.Row="4" Grid.RowSpan="4" Grid.Column="4" Grid.ColumnSpan="4" 
+                    Background="White" Opacity="0.01"
+                    Height="{Binding ElementName=ControlSelf, Path=VerticalSpaceSize}"
+                    Width="{Binding ElementName=ControlSelf, Path=HorizontalSpaceSize}"/>
             <Border Grid.Row="0" Grid.RowSpan="9" Grid.Column="3" Grid.ColumnSpan="3" Background="Black"/>
             <Border Grid.Row="3" Grid.RowSpan="3" Grid.Column="0" Grid.ColumnSpan="9" Background="Black"/>
 

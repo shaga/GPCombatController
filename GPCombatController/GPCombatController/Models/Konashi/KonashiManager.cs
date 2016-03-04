@@ -9,7 +9,7 @@ using Windows.Devices.Enumeration;
 
 namespace GPCombatController.Models.Konashi
 {
-    public class KonashiManager
+    public class KonashiManager : IDisposable
     {
         #region property
 
@@ -23,6 +23,8 @@ namespace GPCombatController.Models.Konashi
 
         private Dictionary<Guid, GattCharacteristic> KonashiCharacteristics { get; set; }
 
+        private DateTime UartSentDateTiem { get; set; } = new DateTime(1970,1,1,0,0,0);
+
         #endregion
 
         #region event
@@ -32,6 +34,18 @@ namespace GPCombatController.Models.Konashi
         public event KonashiUartReceivedHandler KonashiUartReceived;
 
         #endregion
+
+        ~KonashiManager()
+        {
+            Dispose();
+        }
+
+        public void Dispose()
+        {
+            KonashiCharacteristics?.Clear();
+            KonashiService?.Dispose();
+            BatteryServcie?.Dispose();
+        }
 
         public async Task InitKonashi(DeviceInformation konashiInfo, DeviceInformation batteryInfo)
         {
@@ -49,7 +63,8 @@ namespace GPCombatController.Models.Konashi
 
             var batteryCharacteristics = BatteryServcie.GetAllCharacteristics();
 
-            if ((konashiCharacteristics?.Count ?? 0) == 0 || (batteryCharacteristics?.Count ?? 0) == 0)
+            if (konashiCharacteristics == null || konashiCharacteristics.Count == 0 || 
+                batteryCharacteristics == null || batteryCharacteristics.Count == 0)
             {
                 return;
             }
@@ -96,29 +111,31 @@ namespace GPCombatController.Models.Konashi
         }
 
 
-        public async Task SendUartData(string data)
+        public async Task SendUartData(string data, bool isForce = false)
         {
-            await SendUartData(Encoding.ASCII.GetBytes(data));
+            await SendUartData(Encoding.ASCII.GetBytes(data), isForce);
         }
 
-        public async Task SendUartData(byte[] data)
+        public async Task SendUartData(byte[] data, bool isForce = false)
         {
-            var pos = 0;
+            if (data.Length > KonashiConsts.UartDataMaxLength) return;
 
-            while (pos < data.Length)
-            {
-                var len = Math.Min(data.Length - pos, KonashiConsts.UartDataMaxLength);
+            var now = DateTime.Now;
+            var span = now - UartSentDateTiem;
 
-                var sendData = new byte[len + 1];
+            if (!isForce || span.TotalMilliseconds < 50) return;
 
-                sendData[0] = (byte) len;
+            var len = data.Length;
 
-                Array.Copy(data, pos, sendData, 1, len);
+            var sendData = new byte[len + 1];
 
-                await WriteCharacteristicData(KonashiUuid.KonashiUartTxUuid, sendData);
+            sendData[0] = (byte) len;
 
-                pos += len;
-            }
+            Array.Copy(data, 0, sendData, 1, len);
+
+            await WriteCharacteristicData(KonashiUuid.KonashiUartTxUuid, sendData);
+
+            UartSentDateTiem = now;
         }
 
         private async Task InitCharacteristic(GattCharacteristic characteristic)
